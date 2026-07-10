@@ -21,7 +21,7 @@ class CategoryController extends Controller
                 $query->where('name', 'like', '%' . $request->search . '%');
             })
             ->latest()
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         return view('admin.categories.index', compact('categories'));
