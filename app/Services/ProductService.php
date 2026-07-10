@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -45,6 +46,51 @@ class ProductService
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image' => $image->store('products/gallery', 'public'),
+                    ]);
+                }
+            }
+
+            return $product;
+        });
+    }
+
+    public function update(ProductRequest $request, Product $product): Product
+    {
+        return DB::transaction(function () use ($request, $product) {
+
+            $data = $request->validated();
+
+            $data['slug'] = Str::slug($data['name']);
+
+            $data['status'] = $request->boolean('status');
+            $data['featured'] = $request->boolean('featured');
+
+            if ($request->hasFile('thumbnail')) {
+
+                if (
+                    $product->thumbnail &&
+                    Storage::disk('public')->exists($product->thumbnail)
+                ) {
+
+                    Storage::disk('public')->delete($product->thumbnail);
+                }
+
+                $data['thumbnail'] = $request
+                    ->file('thumbnail')
+                    ->store('products', 'public');
+            }
+
+            $product->update($data);
+
+            if ($request->hasFile('gallery')) {
+
+                foreach ($request->file('gallery') as $image) {
+
+                    $product->images()->create([
+                        'image' => $image->store(
+                            'products/gallery',
+                            'public'
+                        ),
                     ]);
                 }
             }

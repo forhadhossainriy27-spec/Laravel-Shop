@@ -43,6 +43,11 @@ Route::middleware(['auth', 'admin'])
             ->name('brands.forceDelete');
 
         // Products
+        Route::delete(
+            'products/gallery/{image}',
+            [ProductController::class, 'destroyGallery']
+        )->name('products.gallery.destroy');
+        
         Route::resource('products', ProductController::class);
     });
 

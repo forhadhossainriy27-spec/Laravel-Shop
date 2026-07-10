@@ -12,6 +12,7 @@ use App\Models\ProductImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -77,17 +78,45 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Product $product)
     {
-        //
+        $product->load('images');
+
+        $categories = Category::where('status', true)
+            ->orderBy('name')
+            ->get();
+
+        $brands = Brand::where('status', true)
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'admin.products.edit',
+            compact('product', 'categories', 'brands')
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductRequest $request, Product $product)
     {
-        //
+        $this->productService->update($request, $product);
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Product updated successfully.');
+    }
+
+    public function destroyGallery(ProductImage $image)
+    {
+        if (Storage::disk('public')->exists($image->image)) {
+            Storage::disk('public')->delete($image->image);
+        }
+
+        $image->delete();
+
+        return back()->with('success', 'Image deleted successfully.');
     }
 
     /**
