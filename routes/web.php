@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\ProductController;
 
 
 Route::get('/', function () {
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'admin'])
             ->name('brands.restore');
         Route::delete('brands/{id}/force-delete', [BrandController::class, 'forceDelete'])
             ->name('brands.forceDelete');
+
+        // Products
+        Route::resource('products', ProductController::class);
     });
 
 Route::middleware('auth')->group(function () {

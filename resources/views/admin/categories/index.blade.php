@@ -67,6 +67,10 @@
                     </th>
 
                     <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-600">
+                        Image
+                    </th>
+
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-600">
                         Category
                     </th>
 
@@ -89,6 +93,14 @@
                 <tr class="border-t hover:bg-slate-50">
 
                     <td class="px-6 py-4">{{ $category->id }}</td>
+
+                    <td class="px-6 py-4">
+                        @if($category->image)
+                        <img
+                            src="{{ asset('storage/'.$category->image) }}"
+                            class="h-12 w-12 rounded-lg border object-cover">
+                        @endif
+                    </td>
 
                     <td class="px-6 py-4 font-medium">
                         {{ $category->name }}

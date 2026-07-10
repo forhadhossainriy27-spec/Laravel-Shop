@@ -42,8 +42,10 @@
             Brands
         </a>
 
-
-        <a href="#" class="block rounded-lg px-4 py-3 hover:bg-slate-800">
+        <a href="{{ route('admin.products.index') }}" class="flex items-center gap-3 rounded-lg px-4 py-3 transition
+   {{ request()->routeIs('admin.products.*')
+        ? 'bg-indigo-600 text-white'
+        : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
             Products
         </a>
 
