@@ -42,6 +42,8 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
 
+        $data['status'] = $request->boolean('status');
+
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')
                 ->store('categories', 'public');
@@ -78,6 +80,8 @@ class CategoryController extends Controller
     public function update(CategoryRequest $request, Category $category)
     {
         $data = $request->validated();
+
+        $data['status'] = $request->boolean('status');
 
         $data['slug'] = Str::slug($data['name']);
 

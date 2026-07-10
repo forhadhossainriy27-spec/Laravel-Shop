@@ -23,10 +23,32 @@
 
 </div>
 
-<form method="GET" class="mb-5">
-    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search category..."
-        class="w-full md:w-80 rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-</form>
+<div class="relative mb-6">
+
+    <input
+        type="text"
+        name="search"
+        value="{{ request('search') }}"
+        placeholder="Search category..."
+        class="w-full md:w-96 rounded-xl border border-slate-300 bg-white py-3 pl-11 pr-4
+               focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
+
+    <svg
+        class="absolute left-4 top-3.5 h-5 w-5 text-slate-400"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor">
+
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
+
+    </svg>
+
+</div>
 
 
 
@@ -36,13 +58,26 @@
 
         <table class="w-full">
 
-            <thead class="bg-slate-100">
+            <thead class="bg-slate-50">
 
                 <tr>
-                    <th class="px-6 py-4 text-left">ID</th>
-                    <th class="px-6 py-4 text-left">Name</th>
-                    <th class="px-6 py-4 text-left">Status</th>
-                    <th class="px-6 py-4 text-center">Action</th>
+
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-600">
+                        ID
+                    </th>
+
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-600">
+                        Category
+                    </th>
+
+                    <th class="px-6 py-4 text-left text-sm font-semibold uppercase tracking-wide text-slate-600">
+                        Status
+                    </th>
+
+                    <th class="px-6 py-4 text-center text-sm font-semibold uppercase tracking-wide text-slate-600">
+                        Action
+                    </th>
+
                 </tr>
 
             </thead>
@@ -75,23 +110,29 @@
 
                     <td class="px-6 py-4 text-center">
 
-                        <a href="{{ route('admin.categories.edit', $category) }}"
-                            class="text-indigo-600 hover:text-indigo-800 font-medium">
-                            Edit
-                        </a>
+                        <div class="flex justify-center gap-2">
 
-                        <span class="mx-2">|</span>
+                            <a
+                                href="{{ route('admin.categories.edit',$category) }}"
+                                class="rounded-lg bg-indigo-100 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-200">
 
-<button
-    @click="
-        deleteModal=true;
-        deleteUrl='{{ route('admin.categories.destroy',$category) }}'
+                                Edit
+
+                            </a>
+
+                            <button
+                                type="button"
+                                @click="
+        deleteModal = true;
+        document.getElementById('deleteForm').action='{{ route('admin.categories.destroy', $category) }}';
     "
-    class="text-red-600 hover:text-red-700">
+                                class="rounded-lg bg-red-100 px-3 py-1.5 text-red-700 hover:bg-red-200">
 
-    Delete
+                                Delete
 
-</button>
+                            </button>
+
+                        </div>
 
                     </td>
 
@@ -101,7 +142,21 @@
 
                 <tr>
                     <td colspan="4" class="text-center py-10 text-slate-500">
-                        No categories found.
+                        <div class="py-12">
+
+                            <div class="text-6xl mb-3">
+                                📂
+                            </div>
+
+                            <h3 class="text-xl font-semibold text-slate-700">
+                                No Categories Found
+                            </h3>
+
+                            <p class="mt-2 text-slate-500">
+                                Click "Add Category" to create your first category.
+                            </p>
+
+                        </div>
                     </td>
                 </tr>
 

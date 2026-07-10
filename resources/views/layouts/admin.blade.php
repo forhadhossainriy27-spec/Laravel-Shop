@@ -28,21 +28,41 @@
             @include('admin.partials.navbar')
 
             <main class="flex-1 p-4 md:p-6">
+
                 @if(session('success'))
+                <div
+                    x-data="{ show: true }"
+                    x-init="setTimeout(() => show = false, 3000)"
+                    x-show="show"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="mb-6 flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-5 py-4 shadow-sm">
 
-                <div x-data="{show:true}" x-show="show" x-transition
-                    class="mb-5 flex items-center justify-between rounded-lg border border-green-200 bg-green-100 px-5 py-4 text-green-800">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">✅</span>
 
-                    <span>{{ session('success') }}</span>
+                        <div>
+                            <p class="font-semibold text-green-700">
+                                Success
+                            </p>
 
-                    <button @click="show=false" class="font-bold">
+                            <p class="text-green-600">
+                                {{ session('success') }}
+                            </p>
+                        </div>
+                    </div>
 
-                        ✕
-
+                    <button
+                        @click="show=false"
+                        class="text-green-700 hover:text-green-900 text-xl">
+                        ×
                     </button>
 
                 </div>
-
                 @endif
 
                 @if(session('error'))
@@ -66,63 +86,63 @@
             </main>
 
         </div>
-    <div
-        x-show="deleteModal"
-        x-transition
-        x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-
         <div
-            @click.outside="deleteModal=false"
-            class="w-full max-w-md rounded-xl bg-white shadow-xl">
+            x-show="deleteModal"
+            x-transition
+            x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 
-            <div class="border-b px-6 py-4">
+            <div
+                @click.outside="deleteModal=false"
+                class="w-full max-w-md rounded-xl bg-white shadow-xl">
 
-                <h2 class="text-xl font-bold">
-                    Delete Category
-                </h2>
+                <div class="border-b px-6 py-4">
 
-            </div>
+                    <h2 class="text-xl font-bold">
+                        Delete Category
+                    </h2>
 
-            <div class="p-6">
+                </div>
 
-                <p class="text-slate-600">
-                    Are you sure you want to delete this category?
-                </p>
+                <div class="p-6">
 
-            </div>
+                    <p class="text-slate-600">
+                        Are you sure you want to delete this category?
+                    </p>
 
-            <div class="flex justify-end gap-3 border-t px-6 py-4">
+                </div>
 
-                <button
-                    @click="deleteModal=false"
-                    class="rounded-lg border px-5 py-2">
-
-                    Cancel
-
-                </button>
-
-                <form
-                    :action="deleteUrl"
-                    method="POST">
-
-                    @csrf
-                    @method('DELETE')
+                <div class="flex justify-end gap-3 border-t px-6 py-4">
 
                     <button
-                        class="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700">
+                        @click="deleteModal=false"
+                        class="rounded-lg border px-5 py-2">
 
-                        Delete
+                        Cancel
 
                     </button>
 
-                </form>
+                    <form
+                        :action="deleteUrl" id="deleteForm"
+                        method="POST">
+
+                        @csrf
+                        @method('DELETE')
+
+                        <button type="submit"
+                            class="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700">
+
+                            Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
     </div>
 
 </body>

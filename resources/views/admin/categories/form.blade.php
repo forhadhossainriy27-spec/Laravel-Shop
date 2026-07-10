@@ -9,29 +9,61 @@
     @enderror
 </div>
 
-<div>
-    <label class="block mb-2 font-medium">Image</label>
+<div
+    x-data="{
+        preview: '{{ isset($category) && $category->image ? asset('storage/'.$category->image) : '' }}'
+    }">
 
-    <input type="file" name="image" class="w-full rounded-lg border-gray-300">
+    <label class="block mb-2 font-medium text-slate-700">
+        Category Image
+    </label>
+
+    <input
+        type="file"
+        name="image"
+        accept="image/*"
+        @change="
+            const file = $event.target.files[0];
+            if(file){
+                preview = URL.createObjectURL(file);
+            }
+        "
+        class="block w-full rounded-lg border border-slate-300 px-3 py-2">
 
     @error('image')
-    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    <p class="mt-1 text-sm text-red-600">
+        {{ $message }}
+    </p>
     @enderror
 
-    @if(!empty($category?->image))
-    <img src="{{ asset('storage/'.$category->image) }}" class="w-28 h-28 mt-3 rounded-lg border object-cover">
-    @endif
+    <template x-if="preview">
+        <div class="mt-5">
+            <img
+                :src="preview"
+                class="h-36 w-36 rounded-xl border object-cover shadow">
+        </div>
+    </template>
+
 </div>
 
 <div>
     <label class="block mb-2 font-medium">Status</label>
 
-    <select name="status" class="w-full rounded-lg border-gray-300">
+    <div class="flex items-center gap-3">
 
-        <option value="1" @selected(old('status',1)==1)>Active</option>
-        <option value="0" @selected(old('status')==='0' )>Inactive</option>
+        <input
+            id="status"
+            type="checkbox"
+            name="status"
+            value="1"
+            {{ old('status', $category->status ?? true) ? 'checked' : '' }}
+            class="h-5 w-5 rounded">
 
-    </select>
+        <label for="status" class="font-medium">
+            Active
+        </label>
+
+    </div>
 </div>
 
 <div class="flex gap-3">
