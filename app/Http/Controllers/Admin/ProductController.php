@@ -9,10 +9,10 @@ use App\Models\Category;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Storage;
+use App\Exports\ProductsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -128,17 +128,17 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-public function show(Product $product)
-{
-    $product->load([
-        'category',
-        'brand',
-        'images',
-        'activities.user',
-    ]);
+    public function show(Product $product)
+    {
+        $product->load([
+            'category',
+            'brand',
+            'images',
+            'activities.user',
+        ]);
 
-    return view('admin.products.show', compact('product'));
-}
+        return view('admin.products.show', compact('product'));
+    }
 
     /**
      * Show the form for editing the specified resource.
@@ -261,6 +261,14 @@ public function show(Product $product)
         return back()->with(
             'success',
             'Product duplicated successfully.'
+        );
+    }
+
+    public function export()
+    {
+        return Excel::download(
+            new ProductsExport,
+            'products.xlsx'
         );
     }
 }

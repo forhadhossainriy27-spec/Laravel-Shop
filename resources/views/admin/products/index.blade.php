@@ -15,6 +15,13 @@
         class="rounded-lg bg-indigo-600 px-5 py-2.5 text-white hover:bg-indigo-700">
         + Add Product
     </a>
+    <a
+        href="{{ route('admin.products.export') }}"
+        class="rounded-lg bg-green-600 px-5 py-2.5 text-white hover:bg-green-700">
+
+        Export Excel
+
+    </a>
 
 </div>
 

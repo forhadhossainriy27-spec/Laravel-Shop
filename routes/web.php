@@ -74,6 +74,13 @@ Route::middleware(['auth', 'admin'])
             'products/{product}/duplicate',
             [ProductController::class, 'duplicate']
         )->name('products.duplicate');
+
+
+        // export excel
+        Route::get(
+            'products-export',
+            [ProductController::class, 'export']
+        )->name('products.export');
     });
 
 Route::middleware('auth')->group(function () {
