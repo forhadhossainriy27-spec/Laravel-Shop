@@ -138,4 +138,62 @@ class ProductService
             ->findOrFail($id)
             ->restore();
     }
+
+    public function duplicate(Product $product): Product
+    {
+        return DB::transaction(function () use ($product) {
+
+            $new = $product->replicate();
+
+            $new->name = $product->name . ' Copy';
+
+            $new->slug = Str::slug($new->name . '-' . Str::random(5));
+
+            $new->sku = 'SKU-' . strtoupper(Str::random(8));
+
+            $new->status = 0;
+
+            $new->stock = 0;
+
+            if ($product->thumbnail) {
+
+                $old = storage_path('app/public/' . $product->thumbnail);
+
+                if (file_exists($old)) {
+
+                    $newPath = 'products/' . uniqid() . '.' . pathinfo($old, PATHINFO_EXTENSION);
+
+                    Storage::disk('public')->put(
+                        $newPath,
+                        file_get_contents($old)
+                    );
+
+                    $new->thumbnail = $newPath;
+                }
+            }
+
+            $new->save();
+
+            foreach ($product->images as $image) {
+
+                $old = storage_path('app/public/' . $image->image);
+
+                if (file_exists($old)) {
+
+                    $newPath = 'products/gallery/' . uniqid() . '.' . pathinfo($old, PATHINFO_EXTENSION);
+
+                    Storage::disk('public')->put(
+                        $newPath,
+                        file_get_contents($old)
+                    );
+
+                    $new->images()->create([
+                        'image' => $newPath
+                    ]);
+                }
+            }
+
+            return $new;
+        });
+    }
 }

@@ -181,25 +181,25 @@
 
                 </select>
 
-<button
-    id="bulkApply"
-    type="submit"
-    disabled
-    class="rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50">
+                <button
+                    id="bulkApply"
+                    type="submit"
+                    disabled
+                    class="rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50">
 
-    Apply
+                    Apply
 
-</button>
+                </button>
 
             </div>
 
             <span
-    id="selectedCount"
-    class="rounded-lg bg-slate-100 px-4 py-2 text-sm">
+                id="selectedCount"
+                class="rounded-lg bg-slate-100 px-4 py-2 text-sm">
 
-    0 Selected
+                0 Selected
 
-</span>
+            </span>
 
             <div class="text-sm text-slate-500">
                 Total: <span class="font-semibold">{{ $products->total() }}</span> Products
@@ -343,6 +343,27 @@
 
                                 </a>
 
+                                |
+
+                                <form
+                                    action="{{ route('admin.products.duplicate', $product) }}"
+                                    method="POST"
+                                    class="inline">
+
+                                    @csrf
+
+                                    <button
+                                        onclick="return confirm('Duplicate this product?')"
+                                        class="text-green-600 hover:underline">
+
+                                        Duplicate
+
+                                    </button>
+
+                                </form>
+
+                                |
+
                                 <button
                                     type="button"
                                     @click="
@@ -390,51 +411,51 @@ document.getElementById('deleteForm').action='{{ route('admin.products.destroy',
 </div>
 
 <script>
-const checkAll = document.getElementById('checkAll');
-const rowChecks = document.querySelectorAll('.rowCheck');
-const count = document.getElementById('selectedCount');
-const apply = document.getElementById('bulkApply');
-const form = document.querySelector('form[action*="bulk-action"]');
+    const checkAll = document.getElementById('checkAll');
+    const rowChecks = document.querySelectorAll('.rowCheck');
+    const count = document.getElementById('selectedCount');
+    const apply = document.getElementById('bulkApply');
+    const form = document.querySelector('form[action*="bulk-action"]');
 
-function updateSelection() {
+    function updateSelection() {
 
-    const checked = document.querySelectorAll('.rowCheck:checked').length;
+        const checked = document.querySelectorAll('.rowCheck:checked').length;
 
-    count.innerText = checked + ' Selected';
+        count.innerText = checked + ' Selected';
 
-    apply.disabled = checked === 0;
-}
+        apply.disabled = checked === 0;
+    }
 
-checkAll?.addEventListener('change', function () {
+    checkAll?.addEventListener('change', function() {
 
-    rowChecks.forEach(item => item.checked = this.checked);
+        rowChecks.forEach(item => item.checked = this.checked);
 
-    updateSelection();
-});
+        updateSelection();
+    });
 
-rowChecks.forEach(item => {
+    rowChecks.forEach(item => {
 
-    item.addEventListener('change', updateSelection);
+        item.addEventListener('change', updateSelection);
 
-});
+    });
 
-form?.addEventListener('submit', function(e){
+    form?.addEventListener('submit', function(e) {
 
-    const action = document.querySelector('[name="action"]').value;
+        const action = document.querySelector('[name="action"]').value;
 
-    if(action === 'delete'){
+        if (action === 'delete') {
 
-        if(!confirm('Delete selected products?')){
+            if (!confirm('Delete selected products?')) {
 
-            e.preventDefault();
+                e.preventDefault();
+
+            }
 
         }
 
-    }
+    });
 
-});
-
-updateSelection();
+    updateSelection();
 </script>
 
 @endsection

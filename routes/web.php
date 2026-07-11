@@ -69,6 +69,11 @@ Route::middleware(['auth', 'admin'])
             'products/bulk-action',
             [ProductController::class, 'bulkAction']
         )->name('products.bulkAction');
+
+        Route::post(
+            'products/{product}/duplicate',
+            [ProductController::class, 'duplicate']
+        )->name('products.duplicate');
     });
 
 Route::middleware('auth')->group(function () {

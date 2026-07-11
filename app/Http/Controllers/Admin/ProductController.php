@@ -247,4 +247,13 @@ class ProductController extends Controller
 
         return back()->with('success', $message);
     }
+    public function duplicate(Product $product)
+    {
+        $this->productService->duplicate($product);
+
+        return back()->with(
+            'success',
+            'Product duplicated successfully.'
+        );
+    }
 }
