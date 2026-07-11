@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\ProductActivity;
+use Illuminate\Support\Facades\Auth;
 
 class ProductService
 {
@@ -49,6 +51,12 @@ class ProductService
                     ]);
                 }
             }
+
+            $this->log(
+                $product,
+                'created',
+                'Product created'
+            );
 
             return $product;
         });
@@ -95,6 +103,11 @@ class ProductService
                 }
             }
 
+            $this->log(
+                $product,
+                'updated',
+                'Product updated'
+            );
             return $product;
         });
     }
@@ -102,6 +115,11 @@ class ProductService
     public function delete(Product $product): void
     {
         $product->delete();
+        $this->log(
+            $product,
+            'deleted',
+            'Product moved to trash'
+        );
     }
 
     public function forceDelete($id): void
@@ -134,9 +152,15 @@ class ProductService
 
     public function restore($id): void
     {
-        Product::onlyTrashed()
-            ->findOrFail($id)
-            ->restore();
+        $product = Product::onlyTrashed()->findOrFail($id);
+
+        $product->restore();
+
+        $this->log(
+            $product,
+            'restored',
+            'Product restored'
+        );
     }
 
     public function duplicate(Product $product): Product
@@ -193,7 +217,22 @@ class ProductService
                 }
             }
 
+            $this->log(
+                $new,
+                'duplicated',
+                'Duplicated from Product #' . $product->id
+            );
             return $new;
         });
+    }
+
+    private function log(Product $product, string $action, string $description = null)
+    {
+        ProductActivity::create([
+            'product_id' => $product->id,
+            'user_id' => Auth::id(),
+            'action' => $action,
+            'description' => $description,
+        ]);
     }
 }

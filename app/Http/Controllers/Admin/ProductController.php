@@ -128,10 +128,17 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+public function show(Product $product)
+{
+    $product->load([
+        'category',
+        'brand',
+        'images',
+        'activities.user',
+    ]);
+
+    return view('admin.products.show', compact('product'));
+}
 
     /**
      * Show the form for editing the specified resource.

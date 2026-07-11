@@ -335,6 +335,13 @@
 
                             <div class="flex justify-center gap-2">
 
+                                <a href="{{ route('admin.products.show',$product) }}"
+                                    class="text-blue-600 hover:underline">
+                                    View
+                                </a>
+
+                                |
+
                                 <a
                                     href="{{ route('admin.products.edit',$product) }}"
                                     class="rounded-lg bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-200">
@@ -356,7 +363,7 @@
                                         onclick="return confirm('Duplicate this product?')"
                                         class="text-green-600 hover:underline">
 
-                                        Duplicate
+                                        Dup
 
                                     </button>
 
@@ -372,7 +379,7 @@ document.getElementById('deleteForm').action='{{ route('admin.products.destroy',
 "
                                     class="rounded-lg bg-red-100 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-200">
 
-                                    Delete
+                                    Del
 
                                 </button>
 
