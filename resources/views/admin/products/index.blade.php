@@ -18,14 +18,88 @@
 
 </div>
 
-<form method="GET" class="mb-5">
+<form method="GET" class="mb-6 grid gap-4 md:grid-cols-6">
 
     <input
         type="text"
         name="search"
         value="{{ request('search') }}"
-        placeholder="Search by name or SKU..."
-        class="w-full md:w-96 rounded-lg border border-slate-300 px-4 py-2.5">
+        placeholder="Search name / SKU"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+    <select
+        name="category"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">All Categories</option>
+
+        @foreach($categories as $category)
+
+        <option
+            value="{{ $category->id }}"
+            @selected(request('category')==$category->id)>
+
+            {{ $category->name }}
+
+        </option>
+
+        @endforeach
+
+    </select>
+
+    <select
+        name="brand"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">All Brands</option>
+
+        @foreach($brands as $brand)
+
+        <option
+            value="{{ $brand->id }}"
+            @selected(request('brand')==$brand->id)>
+
+            {{ $brand->name }}
+
+        </option>
+
+        @endforeach
+
+    </select>
+
+    <select
+        name="status"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">Status</option>
+        <option value="1" @selected(request('status')==='1' )>Active</option>
+        <option value="0" @selected(request('status')==='0' )>Inactive</option>
+
+    </select>
+
+    <select
+        name="featured"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">Featured</option>
+        <option value="1" @selected(request('featured')==='1' )>Yes</option>
+        <option value="0" @selected(request('featured')==='0' )>No</option>
+
+    </select>
+
+    <button
+        class="rounded-lg bg-indigo-600 py-2 text-white hover:bg-indigo-700">
+
+        Filter
+
+    </button>
+    <a
+        href="{{ route('admin.products.index') }}"
+        class="rounded-lg border border-slate-300 px-4 py-2 text-center hover:bg-slate-100">
+
+        Reset
+
+    </a>
 
 </form>
 

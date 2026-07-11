@@ -25,15 +25,36 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::with(['category', 'brand'])
-            ->when($request->search, function ($query) use ($request) {
-                $query->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('sku', 'like', '%' . $request->search . '%');
+            ->when($request->search, function ($q) use ($request) {
+                $q->where(function ($query) use ($request) {
+                    $query->where('name', 'like', "%{$request->search}%")
+                        ->orWhere('sku', 'like', "%{$request->search}%");
+                });
+            })
+            ->when($request->category, function ($q) use ($request) {
+                $q->where('category_id', $request->category);
+            })
+            ->when($request->brand, function ($q) use ($request) {
+                $q->where('brand_id', $request->brand);
+            })
+            ->when($request->status !== null && $request->status !== '', function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->when($request->featured !== null && $request->featured !== '', function ($q) use ($request) {
+                $q->where('featured', $request->featured);
             })
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('admin.products.index', compact('products'));
+        $categories = Category::orderBy('name')->get();
+        $brands = Brand::orderBy('name')->get();
+
+        return view('admin.products.index', compact(
+            'products',
+            'categories',
+            'brands'
+        ));
     }
 
     /**
