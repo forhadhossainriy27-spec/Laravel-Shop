@@ -6,31 +6,59 @@
 
 <x-admin.card class="p-6">
 
-    <div class="flex items-center justify-between">
 
-        <div>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
-            <h2 class="text-2xl font-bold">
-                Welcome Back
-            </h2>
+        <x-admin.stat-card
+            title="Total Products"
+            :value="$totalProducts"
+            color="blue" />
 
-            <p class="text-slate-500 mt-1">
-                {{ auth()->user()->name }}
-            </p>
+        <x-admin.stat-card
+            title="Active"
+            :value="$activeProducts"
+            color="green" />
 
-        </div>
+        <x-admin.stat-card
+            title="Inactive"
+            :value="$inactiveProducts"
+            color="red" />
 
-        <div class="space-x-2">
+        <x-admin.stat-card
+            title="Featured"
+            :value="$featuredProducts"
+            color="yellow" />
 
-            <x-admin.badge variant="success">
-                Active
-            </x-admin.badge>
+        <x-admin.stat-card
+            title="Low Stock"
+            :value="$lowStockProducts"
+            color="orange" />
 
-            <x-admin.button>
-                Add Product
-            </x-admin.button>
+        <x-admin.stat-card
+            title="Out Of Stock"
+            :value="$outOfStockProducts"
+            color="rose" />
 
-        </div>
+        <x-admin.stat-card
+            title="Inventory Value"
+            :value="'৳ '.number_format($totalInventoryValue,2)"
+            color="indigo" />
+
+        <x-admin.stat-card
+            title="Added (30 Days)"
+            :value="$recentProducts"
+            color="cyan" />
+
+    </div>
+
+    <div class="mt-8 bg-white rounded-2xl border shadow p-6">
+
+        <h2 class="text-xl font-bold mb-6">
+            Products by Category
+        </h2>
+
+        <canvas id="categoryChart" height="120"></canvas>
+        
 
     </div>
 

@@ -144,7 +144,61 @@
 
         </div>
     </div>
-@stack('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @stack('scripts')
+
+@if(isset($categoryChart))
+<script>
+
+const ctx=document.getElementById('categoryChart');
+
+new Chart(ctx,{
+
+    type:'bar',
+
+    data:{
+
+        labels:@json($categoryChart->pluck('name')),
+
+        datasets:[{
+
+            label:'Products',
+
+            data:@json($categoryChart->pluck('products_count')),
+
+            borderWidth:1
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                display:false
+            }
+
+        },
+
+        scales:{
+
+            y:{
+                beginAtZero:true
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+@endif
+
 </body>
 
 </html>

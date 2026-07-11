@@ -12,7 +12,11 @@ use App\Models\ProductImage;
 use App\Services\ProductService;
 use Illuminate\Support\Facades\Storage;
 use App\Exports\ProductsExport;
+use App\Imports\ProductsImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class ProductController extends Controller
 {
@@ -24,6 +28,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        
         $query = Product::with(['category', 'brand']);
 
         $query->when($request->search, function ($q) use ($request) {
@@ -87,10 +92,22 @@ class ProductController extends Controller
         $categories = Category::orderBy('name')->get();
         $brands = Brand::orderBy('name')->get();
 
+$chart = Product::selectRaw('DATE(created_at) as date, COUNT(*) as total')
+    ->where('created_at', '>=', now()->subDays(30))
+    ->groupBy('date')
+    ->orderBy('date')
+    ->get();
+
+$productsLast30Days = [
+    'labels' => $chart->pluck('date')->map(fn ($d) => \Carbon\Carbon::parse($d)->format('d M'))->values()->toArray(),
+    'data'   => $chart->pluck('total')->values()->toArray(),
+];
+
         return view('admin.products.index', compact(
             'products',
             'categories',
-            'brands'
+            'brands',
+            'productsLast30Days'
         ));
     }
 
@@ -270,5 +287,20 @@ class ProductController extends Controller
             new ProductsExport,
             'products.xlsx'
         );
+    }
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        $import = new ProductsImport();
+
+        Excel::import($import, $request->file('file'));
+// dd($import->failures());
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Import completed.')
+            ->with('failures', $import->failures());
     }
 }

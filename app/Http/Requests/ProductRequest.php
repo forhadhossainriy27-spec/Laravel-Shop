@@ -29,11 +29,13 @@ class ProductRequest extends FormRequest
             'category_id' => ['required', 'exists:categories,id'],
             'brand_id' => ['required', 'exists:brands,id'],
 
-            'name' => [
-                'required',
-                'max:255',
-                Rule::unique('products', 'name')->ignore($product),
-            ],
+    'name' => [
+        'required',
+        'max:255',
+        Rule::unique('products', 'name')->ignore(
+            $product instanceof \App\Models\Product ? $product->id : $product
+        ),
+    ],
 
             'price' => ['required', 'numeric', 'min:0'],
             'discount_price' => ['nullable', 'numeric', 'lte:price'],

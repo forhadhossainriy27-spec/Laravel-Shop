@@ -81,6 +81,11 @@ Route::middleware(['auth', 'admin'])
             'products-export',
             [ProductController::class, 'export']
         )->name('products.export');
+        // import excel
+        Route::post(
+            'products-import',
+            [ProductController::class, 'import']
+        )->name('products.import');
     });
 
 Route::middleware('auth')->group(function () {

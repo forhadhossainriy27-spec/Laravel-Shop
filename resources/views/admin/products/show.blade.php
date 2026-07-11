@@ -270,69 +270,103 @@
     </div>
 
     {{-- Activity --}}
-    <div class="mt-6 rounded-xl border bg-white p-6 shadow-sm">
+<div class="bg-white rounded-2xl shadow-sm border mt-8">
 
-        <h2 class="mb-6 text-xl font-bold">
-
+    <div class="border-b px-6 py-4">
+        <h2 class="text-xl font-bold">
             Activity Timeline
-
         </h2>
+    </div>
 
-        <div class="space-y-6">
+    <div class="p-6">
 
-            @forelse($product->activities as $activity)
+        @forelse($product->activities->sortByDesc('created_at') as $activity)
 
-                <div class="flex gap-4">
+            <div class="relative pl-8 pb-8 last:pb-0">
 
-                    <div class="mt-2 h-3 w-3 rounded-full bg-indigo-600"></div>
+                {{-- Line --}}
+                @unless($loop->last)
+                    <div class="absolute left-3 top-6 w-0.5 h-full bg-slate-200"></div>
+                @endunless
 
-                    <div class="flex-1 border-l pl-5">
+                {{-- Dot --}}
+                <div class="absolute left-0 top-1 h-6 w-6 rounded-full
+                    @switch($activity->action)
 
-                        <div class="flex flex-wrap items-center gap-3">
+                        @case('created')
+                            bg-green-500
+                            @break
 
-                            <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">
+                        @case('updated')
+                            bg-blue-500
+                            @break
+
+                        @case('deleted')
+                            bg-red-500
+                            @break
+
+                        @case('restored')
+                            bg-yellow-500
+                            @break
+
+                        @default
+                            bg-slate-500
+
+                    @endswitch
+                ">
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4">
+
+                    <div class="flex flex-col md:flex-row md:justify-between gap-2">
+
+                        <div>
+
+                            <h4 class="font-semibold">
 
                                 {{ ucfirst($activity->action) }}
 
-                            </span>
+                            </h4>
 
-                            <span class="text-xs text-slate-400">
+                            <p class="text-sm text-slate-600 mt-1">
 
-                                {{ $activity->created_at->format('d M Y h:i A') }}
+                                {{ $activity->description }}
 
-                            </span>
+                            </p>
 
                         </div>
 
-                        <p class="mt-2">
+                        <span class="text-xs text-slate-400">
 
-                            {{ $activity->description }}
+                            {{ $activity->created_at->format('d M Y h:i A') }}
 
-                        </p>
+                        </span>
 
-                        <p class="mt-1 text-sm text-slate-500">
+                    </div>
 
-                            By {{ $activity->user?->name ?? 'System' }}
+                    <div class="mt-3 text-sm text-slate-500">
 
-                        </p>
+                        👤 {{ $activity->user?->name ?? 'System' }}
 
                     </div>
 
                 </div>
 
-            @empty
+            </div>
 
-                <div class="rounded-lg bg-slate-50 p-6 text-center text-slate-500">
+        @empty
 
-                    No Activity Found
+            <div class="text-center py-10 text-slate-500">
 
-                </div>
+                No activity found.
 
-            @endforelse
+            </div>
 
-        </div>
+        @endforelse
 
     </div>
+
+</div>
 
 </div>
 

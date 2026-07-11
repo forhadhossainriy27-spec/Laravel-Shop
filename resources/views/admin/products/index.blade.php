@@ -4,23 +4,85 @@
 
 @section('content')
 
+
 <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+
+<!-- excel import message -->
+@if(session()->has('failures') && count(session('failures')))
+
+<div class="mb-6 rounded-xl border border-red-300 bg-red-50 p-5">
+
+    <h3 class="mb-3 text-lg font-bold text-red-700">
+
+        Import Failed Rows
+
+    </h3>
+
+    @foreach(session('failures') as $failure)
+
+        <div class="mb-4 rounded-lg bg-white p-3 border">
+
+            <div class="font-semibold text-red-600">
+
+                Row {{  $failure['row'] }} 
+
+            </div>
+
+            <ul class="mt-2 list-disc pl-5 text-sm text-slate-700">
+
+                @foreach($failure['errors'] as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endforeach
+
+</div>
+
+@endif
 
     <div>
         <h1 class="text-3xl font-bold">Products</h1>
         <p class="text-slate-500">Manage all products</p>
     </div>
-
-    <a href="{{ route('admin.products.create') }}"
-        class="rounded-lg bg-indigo-600 px-5 py-2.5 text-white hover:bg-indigo-700">
-        + Add Product
-    </a>
     <a
         href="{{ route('admin.products.export') }}"
         class="rounded-lg bg-green-600 px-5 py-2.5 text-white hover:bg-green-700">
 
         Export Excel
 
+    </a>
+    <form
+        action="{{ route('admin.products.import') }}"
+        method="POST"
+        enctype="multipart/form-data"
+        class="flex items-center gap-2">
+
+        @csrf
+
+        <input
+            type="file"
+            name="file"
+            accept=".xlsx,.xls,.csv"
+            required
+            class="rounded border px-2 py-2">
+
+        <button
+            class="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700">
+
+            Import
+
+        </button>
+
+    </form>
+    <a href="{{ route('admin.products.create') }}"
+        class="rounded-lg bg-indigo-600 px-5 py-2.5 text-white hover:bg-indigo-700">
+        + Add Product
     </a>
 
 </div>
@@ -424,6 +486,16 @@ document.getElementById('deleteForm').action='{{ route('admin.products.destroy',
 
 </div>
 
+<div class="bg-white rounded-xl border shadow-sm p-6 mt-6">
+    <h2 class="text-xl font-bold mb-4">
+        Products Added Last 30 Days
+    </h2>
+
+    <div class="relative h-80 w-full">
+    <canvas id="productsLast30DaysChart"></canvas>
+</div>
+</div>
+
 <script>
     const checkAll = document.getElementById('checkAll');
     const rowChecks = document.querySelectorAll('.rowCheck');
@@ -471,5 +543,36 @@ document.getElementById('deleteForm').action='{{ route('admin.products.destroy',
 
     updateSelection();
 </script>
+
+@push('scripts')
+<script>
+const chartData = @json($productsLast30Days ?? [
+    'labels' => [],
+    'data' => [],
+]);
+
+const canvas = document.getElementById('productsLast30DaysChart');
+
+if (canvas) {
+    new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Products',
+                data: chartData.data,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+}
+</script>
+@endpush
 
 @endsection
