@@ -24,26 +24,63 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand'])
-            ->when($request->search, function ($q) use ($request) {
-                $q->where(function ($query) use ($request) {
-                    $query->where('name', 'like', "%{$request->search}%")
-                        ->orWhere('sku', 'like', "%{$request->search}%");
-                });
-            })
-            ->when($request->category, function ($q) use ($request) {
-                $q->where('category_id', $request->category);
-            })
-            ->when($request->brand, function ($q) use ($request) {
-                $q->where('brand_id', $request->brand);
-            })
-            ->when($request->status !== null && $request->status !== '', function ($q) use ($request) {
-                $q->where('status', $request->status);
-            })
-            ->when($request->featured !== null && $request->featured !== '', function ($q) use ($request) {
-                $q->where('featured', $request->featured);
-            })
-            ->latest()
+        $query = Product::with(['category', 'brand']);
+
+        $query->when($request->search, function ($q) use ($request) {
+            $q->where(function ($query) use ($request) {
+                $query->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('sku', 'like', "%{$request->search}%");
+            });
+        });
+
+        $query->when($request->category, fn($q) => $q->where('category_id', $request->category));
+
+        $query->when($request->brand, fn($q) => $q->where('brand_id', $request->brand));
+
+        $query->when(
+            $request->status !== null && $request->status !== '',
+            fn($q) => $q->where('status', $request->status)
+        );
+
+        $query->when(
+            $request->featured !== null && $request->featured !== '',
+            fn($q) => $q->where('featured', $request->featured)
+        );
+
+        $query->when($request->stock == 'low', fn($q) => $q->where('stock', '<=', 5));
+
+        $query->when($request->stock == 'out', fn($q) => $q->where('stock', 0));
+
+        switch ($request->sort) {
+            case 'name_asc':
+                $query->orderBy('name');
+                break;
+
+            case 'name_desc':
+                $query->orderByDesc('name');
+                break;
+
+            case 'price_low':
+                $query->orderBy('price');
+                break;
+
+            case 'price_high':
+                $query->orderByDesc('price');
+                break;
+
+            case 'stock':
+                $query->orderBy('stock');
+                break;
+
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            default:
+                $query->latest();
+        }
+
+        $products = $query
             ->paginate(10)
             ->withQueryString();
 
@@ -172,5 +209,42 @@ class ProductController extends Controller
         $this->productService->forceDelete($id);
 
         return back()->with('success', 'Product permanently deleted.');
+    }
+
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'ids' => ['required', 'array'],
+            'action' => ['required'],
+        ]);
+
+        $products = Product::whereIn('id', $request->ids);
+
+        switch ($request->action) {
+
+            case 'delete':
+                $products->delete();
+                $message = 'Products deleted successfully.';
+                break;
+
+            case 'active':
+                $products->update([
+                    'status' => true
+                ]);
+                $message = 'Products activated.';
+                break;
+
+            case 'inactive':
+                $products->update([
+                    'status' => false
+                ]);
+                $message = 'Products deactivated.';
+                break;
+
+            default:
+                return back()->with('error', 'Invalid action.');
+        }
+
+        return back()->with('success', $message);
     }
 }

@@ -101,133 +101,285 @@
 
     </a>
 
+    <select
+        name="sort"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">Latest</option>
+
+        <option value="oldest" @selected(request('sort')=='oldest' )>
+            Oldest
+        </option>
+
+        <option value="name_asc" @selected(request('sort')=='name_asc' )>
+            Name A-Z
+        </option>
+
+        <option value="name_desc" @selected(request('sort')=='name_desc' )>
+            Name Z-A
+        </option>
+
+        <option value="price_low" @selected(request('sort')=='price_low' )>
+            Price Low → High
+        </option>
+
+        <option value="price_high" @selected(request('sort')=='price_high' )>
+            Price High → Low
+        </option>
+
+        <option value="stock" @selected(request('sort')=='stock' )>
+            Stock
+        </option>
+
+    </select>
+
+    <select
+        name="stock"
+        class="rounded-lg border border-slate-300 px-4 py-2">
+
+        <option value="">All Stock</option>
+
+        <option
+            value="low"
+            @selected(request('stock')=='low' )>
+
+            Low Stock
+
+        </option>
+
+        <option
+            value="out"
+            @selected(request('stock')=='out' )>
+
+            Out Of Stock
+
+        </option>
+
+    </select>
+
 </form>
 
-<div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
+<div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-    <table class="min-w-full">
+    <form action="{{ route('admin.products.bulkAction') }}" method="POST">
 
-        <thead class="bg-slate-50">
+        @csrf
 
-            <tr>
+        <!-- Top Toolbar -->
+        <div class="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
 
-                <th class="px-4 py-3 text-left">Image</th>
-                <th class="px-4 py-3 text-left">Product</th>
-                <th class="px-4 py-3 text-left">Category</th>
-                <th class="px-4 py-3 text-left">Brand</th>
-                <th class="px-4 py-3 text-right">Price</th>
-                <th class="px-4 py-3 text-center">Stock</th>
-                <th class="px-4 py-3 text-center">Status</th>
-                <th class="px-4 py-3 text-center">Action</th>
+            <div class="flex flex-col gap-3 sm:flex-row">
 
-            </tr>
+                <select
+                    name="action"
+                    class="rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500">
 
-        </thead>
+                    <option value="">Bulk Action</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="delete">Delete</option>
 
-        <tbody>
+                </select>
 
-            @forelse($products as $product)
+<button
+    id="bulkApply"
+    type="submit"
+    disabled
+    class="rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50">
 
-            <tr class="border-t">
+    Apply
 
-                <td class="px-4 py-3">
+</button>
 
-                    @if($product->thumbnail)
+            </div>
 
-                    <img
-                        src="{{ asset('storage/'.$product->thumbnail) }}"
-                        class="h-14 w-14 rounded-lg border object-cover">
+            <span
+    id="selectedCount"
+    class="rounded-lg bg-slate-100 px-4 py-2 text-sm">
 
-                    @endif
+    0 Selected
 
-                </td>
+</span>
 
-                <td class="px-4 py-3">
+            <div class="text-sm text-slate-500">
+                Total: <span class="font-semibold">{{ $products->total() }}</span> Products
+            </div>
 
-                    <div class="font-semibold">
-                        {{ $product->name }}
-                    </div>
+        </div>
 
-                    <div class="text-xs text-slate-500">
-                        {{ $product->sku }}
-                    </div>
+        <!-- Table -->
+        <div class="overflow-x-auto">
 
-                </td>
+            <table class="min-w-full text-sm">
 
-                <td class="px-4 py-3">
-                    {{ $product->category->name }}
-                </td>
+                <thead class="sticky top-0 bg-slate-100">
 
-                <td class="px-4 py-3">
-                    {{ $product->brand->name }}
-                </td>
+                    <tr class="text-slate-700">
 
-                <td class="px-4 py-3 text-right">
-                    ৳ {{ number_format($product->price,2) }}
-                </td>
+                        <th class="px-4 py-3 text-center">
+                            <input type="checkbox" id="checkAll">
+                        </th>
 
-                <td class="px-4 py-3 text-center">
-                    {{ $product->stock }}
-                </td>
+                        <th class="px-4 py-3 text-left">Image</th>
+                        <th class="px-4 py-3 text-left">Product</th>
+                        <th class="px-4 py-3 text-left">Category</th>
+                        <th class="px-4 py-3 text-left">Brand</th>
+                        <th class="px-4 py-3 text-right">Price</th>
+                        <th class="px-4 py-3 text-center">Stock</th>
+                        <th class="px-4 py-3 text-center">Status</th>
+                        <th class="px-4 py-3 text-center">Action</th>
 
-                <td class="px-4 py-3 text-center">
+                    </tr>
 
-                    @if($product->status)
-                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs text-green-700">
-                        Active
-                    </span>
-                    @else
-                    <span class="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">
-                        Inactive
-                    </span>
-                    @endif
+                </thead>
 
-                </td>
+                <tbody>
 
-                <td class="px-4 py-3 text-center">
+                    @forelse($products as $product)
 
-                    <a href="{{ route('admin.products.edit',$product) }}"
-                        class="text-indigo-600 hover:underline">
+                    <tr class="border-t even:bg-slate-50 hover:bg-indigo-50 transition">
 
-                        Edit
+                        <td class="px-4 py-3 text-center">
+                            <input
+                                type="checkbox"
+                                class="rowCheck rounded"
+                                name="ids[]"
+                                value="{{ $product->id }}">
+                        </td>
 
-                    </a>
+                        <td class="px-4 py-3">
 
-                    |
+                            @if($product->thumbnail)
 
-                    <button
-                        type="button"
-                        @click="
+                            <img
+                                src="{{ asset('storage/'.$product->thumbnail) }}"
+                                class="h-16 w-16 rounded-xl border object-cover">
+
+                            @else
+
+                            <div class="flex h-16 w-16 items-center justify-center rounded-xl bg-slate-100 text-xs text-slate-400">
+                                No Image
+                            </div>
+
+                            @endif
+
+                        </td>
+
+                        <td class="px-4 py-3">
+
+                            <h4 class="font-semibold text-slate-800">
+                                {{ $product->name }}
+                            </h4>
+
+                            <p class="text-xs text-slate-500">
+                                SKU: {{ $product->sku }}
+                            </p>
+
+                        </td>
+
+                        <td class="px-4 py-3">
+                            {{ $product->category->name }}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            {{ $product->brand->name }}
+                        </td>
+
+                        <td class="px-4 py-3 text-right font-semibold text-indigo-600">
+                            ৳ {{ number_format($product->price,2) }}
+                        </td>
+
+                        <td class="px-4 py-3 text-center">
+
+                            @if($product->stock==0)
+
+                            <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+                                Out of Stock
+                            </span>
+
+                            @elseif($product->stock<=5)
+
+                                <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                                Low ({{ $product->stock }})
+                                </span>
+
+                                @else
+
+                                <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                                    {{ $product->stock }}
+                                </span>
+
+                                @endif
+
+                        </td>
+
+                        <td class="px-4 py-3 text-center">
+
+                            @if($product->status)
+
+                            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                                Active
+                            </span>
+
+                            @else
+
+                            <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                                Inactive
+                            </span>
+
+                            @endif
+
+                        </td>
+
+                        <td class="px-4 py-3">
+
+                            <div class="flex justify-center gap-2">
+
+                                <a
+                                    href="{{ route('admin.products.edit',$product) }}"
+                                    class="rounded-lg bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-200">
+
+                                    Edit
+
+                                </a>
+
+                                <button
+                                    type="button"
+                                    @click="
 deleteModal=true;
 document.getElementById('deleteForm').action='{{ route('admin.products.destroy',$product) }}';
 "
-                        class="text-red-600">
+                                    class="rounded-lg bg-red-100 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-200">
 
-                        Delete
+                                    Delete
 
-                    </button>
+                                </button>
 
-                </td>
+                            </div>
 
-            </tr>
+                        </td>
 
-            @empty
+                    </tr>
 
-            <tr>
+                    @empty
 
-                <td colspan="8" class="py-12 text-center text-slate-500">
+                    <tr>
 
-                    No products found.
+                        <td colspan="9" class="py-16 text-center text-slate-500">
+                            No products found.
+                        </td>
 
-                </td>
+                    </tr>
 
-            </tr>
+                    @endforelse
 
-            @endforelse
+                </tbody>
 
-        </tbody>
+            </table>
 
-    </table>
+        </div>
+
+    </form>
 
 </div>
 
@@ -236,5 +388,53 @@ document.getElementById('deleteForm').action='{{ route('admin.products.destroy',
     {{ $products->links() }}
 
 </div>
+
+<script>
+const checkAll = document.getElementById('checkAll');
+const rowChecks = document.querySelectorAll('.rowCheck');
+const count = document.getElementById('selectedCount');
+const apply = document.getElementById('bulkApply');
+const form = document.querySelector('form[action*="bulk-action"]');
+
+function updateSelection() {
+
+    const checked = document.querySelectorAll('.rowCheck:checked').length;
+
+    count.innerText = checked + ' Selected';
+
+    apply.disabled = checked === 0;
+}
+
+checkAll?.addEventListener('change', function () {
+
+    rowChecks.forEach(item => item.checked = this.checked);
+
+    updateSelection();
+});
+
+rowChecks.forEach(item => {
+
+    item.addEventListener('change', updateSelection);
+
+});
+
+form?.addEventListener('submit', function(e){
+
+    const action = document.querySelector('[name="action"]').value;
+
+    if(action === 'delete'){
+
+        if(!confirm('Delete selected products?')){
+
+            e.preventDefault();
+
+        }
+
+    }
+
+});
+
+updateSelection();
+</script>
 
 @endsection

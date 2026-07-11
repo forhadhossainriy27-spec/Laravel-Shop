@@ -64,6 +64,11 @@ Route::middleware(['auth', 'admin'])
             'products/{id}/force-delete',
             [ProductController::class, 'forceDelete']
         )->name('products.forceDelete');
+
+        Route::post(
+            'products/bulk-action',
+            [ProductController::class, 'bulkAction']
+        )->name('products.bulkAction');
     });
 
 Route::middleware('auth')->group(function () {
