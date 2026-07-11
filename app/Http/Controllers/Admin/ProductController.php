@@ -128,4 +128,28 @@ class ProductController extends Controller
 
         return back()->with('success', 'Product moved to trash.');
     }
+
+    public function trash()
+    {
+        $products = Product::onlyTrashed()
+            ->with(['category', 'brand'])
+            ->latest('deleted_at')
+            ->paginate(10);
+
+        return view('admin.products.trash', compact('products'));
+    }
+
+    public function restore($id)
+    {
+        $this->productService->restore($id);
+
+        return back()->with('success', 'Product restored successfully.');
+    }
+
+    public function forceDelete($id)
+    {
+        $this->productService->forceDelete($id);
+
+        return back()->with('success', 'Product permanently deleted.');
+    }
 }

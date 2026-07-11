@@ -49,6 +49,12 @@
             Products
         </a>
 
+        <a
+            href="{{ route('admin.products.trash') }}"
+            class="block rounded-lg px-4 py-2 text-slate-600 hover:bg-slate-100">
+            🗑 Product Trash
+        </a>
+
         <a href="#" class="block rounded-lg px-4 py-3 hover:bg-slate-800">
             Orders
         </a>

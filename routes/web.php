@@ -47,8 +47,23 @@ Route::middleware(['auth', 'admin'])
             'products/gallery/{image}',
             [ProductController::class, 'destroyGallery']
         )->name('products.gallery.destroy');
-        
+
         Route::resource('products', ProductController::class);
+
+        Route::get(
+            'products-trash',
+            [ProductController::class, 'trash']
+        )->name('products.trash');
+
+        Route::patch(
+            'products/{id}/restore',
+            [ProductController::class, 'restore']
+        )->name('products.restore');
+
+        Route::delete(
+            'products/{id}/force-delete',
+            [ProductController::class, 'forceDelete']
+        )->name('products.forceDelete');
     });
 
 Route::middleware('auth')->group(function () {

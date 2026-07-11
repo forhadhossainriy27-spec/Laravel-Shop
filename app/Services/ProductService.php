@@ -104,22 +104,38 @@ class ProductService
         $product->delete();
     }
 
-    public function forceDelete(Product $product): void
+    public function forceDelete($id): void
     {
-        DB::transaction(function () use ($product) {
+        $product = Product::onlyTrashed()
+            ->with('images')
+            ->findOrFail($id);
 
-            if ($product->thumbnail) {
-                Storage::disk('public')->delete($product->thumbnail);
-            }
+        if (
+            $product->thumbnail &&
+            Storage::disk('public')->exists($product->thumbnail)
+        ) {
+            Storage::disk('public')->delete($product->thumbnail);
+        }
 
-            foreach ($product->images as $image) {
+        foreach ($product->images as $image) {
 
+            if (
+                $image->image &&
+                Storage::disk('public')->exists($image->image)
+            ) {
                 Storage::disk('public')->delete($image->image);
-
-                $image->delete();
             }
 
-            $product->forceDelete();
-        });
+            $image->forceDelete();
+        }
+
+        $product->forceDelete();
+    }
+
+    public function restore($id): void
+    {
+        Product::onlyTrashed()
+            ->findOrFail($id)
+            ->restore();
     }
 }
