@@ -3,3 +3,41 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* Print */
+
+@media print {
+
+    body {
+        background: #fff !important;
+    }
+
+    nav,
+    aside,
+    header,
+    footer,
+    button,
+    .print-hidden {
+        display: none !important;
+    }
+
+    main {
+        margin: 0;
+        padding: 0;
+    }
+
+    .shadow,
+    .shadow-lg {
+        box-shadow: none !important;
+    }
+
+    .rounded-2xl,
+    .rounded-xl {
+        border-radius: 0;
+    }
+
+    .border {
+        border: 1px solid #000;
+    }
+
+}

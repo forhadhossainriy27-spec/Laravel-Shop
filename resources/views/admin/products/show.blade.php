@@ -4,6 +4,7 @@
 
 @section('content')
 
+
 <div class="mx-auto max-w-7xl">
 
     {{-- Header --}}
@@ -44,17 +45,17 @@
 
             @if($product->thumbnail)
 
-                <img
-                    src="{{ asset('storage/'.$product->thumbnail) }}"
-                    class="mx-auto h-80 w-full rounded-xl border object-cover">
+            <img
+                src="{{ asset('storage/'.$product->thumbnail) }}"
+                class="mx-auto h-80 w-full rounded-xl border object-cover">
 
             @else
 
-                <div class="flex h-80 items-center justify-center rounded-xl border bg-slate-100">
+            <div class="flex h-80 items-center justify-center rounded-xl border bg-slate-100">
 
-                    No Image
+                No Image
 
-                </div>
+            </div>
 
             @endif
 
@@ -123,21 +124,21 @@
 
                     @if($product->stock==0)
 
-                        <span class="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
+                    <span class="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
 
-                            Out Of Stock
+                        Out Of Stock
 
-                        </span>
+                    </span>
 
                     @elseif($product->stock<=5)
 
                         <span class="rounded-full bg-yellow-100 px-3 py-1 text-sm text-yellow-700">
 
-                            Low Stock ({{ $product->stock }})
+                        Low Stock ({{ $product->stock }})
 
                         </span>
 
-                    @else
+                        @else
 
                         <span class="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
 
@@ -145,7 +146,7 @@
 
                         </span>
 
-                    @endif
+                        @endif
 
                 </div>
 
@@ -157,19 +158,19 @@
 
                     @if($product->status)
 
-                        <span class="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
+                    <span class="rounded-full bg-green-100 px-3 py-1 text-sm text-green-700">
 
-                            Active
+                        Active
 
-                        </span>
+                    </span>
 
                     @else
 
-                        <span class="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
+                    <span class="rounded-full bg-red-100 px-3 py-1 text-sm text-red-700">
 
-                            Inactive
+                        Inactive
 
-                        </span>
+                    </span>
 
                     @endif
 
@@ -183,19 +184,19 @@
 
                     @if($product->featured)
 
-                        <span class="rounded-full bg-indigo-100 px-3 py-1 text-sm text-indigo-700">
+                    <span class="rounded-full bg-indigo-100 px-3 py-1 text-sm text-indigo-700">
 
-                            Yes
+                        Yes
 
-                        </span>
+                    </span>
 
                     @else
 
-                        <span class="rounded-full bg-slate-100 px-3 py-1 text-sm">
+                    <span class="rounded-full bg-slate-100 px-3 py-1 text-sm">
 
-                            No
+                        No
 
-                        </span>
+                    </span>
 
                     @endif
 
@@ -251,42 +252,101 @@
 
             @forelse($product->images as $image)
 
-                <img
-                    src="{{ asset('storage/'.$image->image) }}"
-                    class="h-32 w-full rounded-xl border object-cover transition duration-300 hover:scale-105">
+            <img
+                src="{{ asset('storage/'.$image->image) }}"
+                class="h-32 w-full rounded-xl border object-cover transition duration-300 hover:scale-105">
 
             @empty
 
-                <div class="col-span-full rounded-lg bg-slate-50 p-6 text-center text-slate-500">
+            <div class="col-span-full rounded-lg bg-slate-50 p-6 text-center text-slate-500">
 
-                    No Gallery Images
+                No Gallery Images
 
-                </div>
+            </div>
 
             @endforelse
 
         </div>
 
     </div>
+    
+<div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 print:grid-cols-2">
 
-    {{-- Activity --}}
-<div class="bg-white rounded-2xl shadow-sm border mt-8">
+    {{-- Barcode Card --}}
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 text-center">
 
-    <div class="border-b px-6 py-4">
-        <h2 class="text-xl font-bold">
-            Activity Timeline
-        </h2>
+        <h3 class="text-lg font-bold text-slate-800 mb-1">
+            Product Barcode
+        </h3>
+
+        <p class="text-sm text-slate-500 mb-5">
+            Scan or Print
+        </p>
+
+        <div class="flex justify-center">
+            {!! DNS1D::getBarcodeHTML($product->sku, 'C128', 2.2, 70) !!}
+        </div>
+
+        <div class="mt-4">
+            <span class="inline-block bg-slate-100 px-4 py-2 rounded-lg font-mono text-sm tracking-widest">
+                {{ $product->sku }}
+            </span>
+        </div>
+
     </div>
 
-    <div class="p-6">
+    {{-- QR Code Card --}}
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 text-center">
 
-        @forelse($product->activities->sortByDesc('created_at') as $activity)
+        <h3 class="text-lg font-bold text-slate-800 mb-1">
+            Product QR Code
+        </h3>
+
+        <p class="text-sm text-slate-500 mb-5">
+            Open Product Page
+        </p>
+
+        <div class="flex justify-center">
+            {!! QrCode::size(180)
+                ->margin(1)
+                ->generate(route('admin.products.show',$product)) !!}
+        </div>
+
+        <p class="mt-4 text-xs text-slate-500 break-all">
+            {{ route('admin.products.show',$product) }}
+        </p>
+
+    </div>
+
+</div>
+
+<div class="mt-6 flex justify-end print:hidden">
+    <button
+        onclick="window.print()"
+        class="px-6 py-3 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition">
+        🖨️ Print Barcode & QR
+    </button>
+</div>
+
+
+    {{-- Activity --}}
+    <div class="bg-white rounded-2xl shadow-sm border mt-8">
+
+        <div class="border-b px-6 py-4">
+            <h2 class="text-xl font-bold">
+                Activity Timeline
+            </h2>
+        </div>
+
+        <div class="p-6">
+
+            @forelse($product->activities->sortByDesc('created_at') as $activity)
 
             <div class="relative pl-8 pb-8 last:pb-0">
 
                 {{-- Line --}}
                 @unless($loop->last)
-                    <div class="absolute left-3 top-6 w-0.5 h-full bg-slate-200"></div>
+                <div class="absolute left-3 top-6 w-0.5 h-full bg-slate-200"></div>
                 @endunless
 
                 {{-- Dot --}}
@@ -354,7 +414,7 @@
 
             </div>
 
-        @empty
+            @empty
 
             <div class="text-center py-10 text-slate-500">
 
@@ -362,11 +422,11 @@
 
             </div>
 
-        @endforelse
+            @endforelse
+
+        </div>
 
     </div>
-
-</div>
 
 </div>
 
